@@ -82,51 +82,7 @@ $course = get_course($lesson_data->course_id);
     <link href="assets/assets/vendors/@coreui/chartjs/css/coreui-chartjs.css" rel="stylesheet">
 </head>
 <body class="c-app">
-<div class="c-sidebar c-sidebar-dark c-sidebar-fixed c-sidebar-lg-show" id="sidebar">
-    <div class="c-sidebar-brand d-lg-down-none">
-        <img class="c-sidebar-brand-full" width="118" height="46" alt="CoreUI Logo" src="assets/img/logo_white.png">
-        <img class="c-sidebar-brand-minimized" width="46" height="46" alt="CoreUI Logo" src="assets/img/logo_white.png">
-    </div>
-    <ul class="c-sidebar-nav">
-        <li class="c-sidebar-nav-item">
-            <a class="c-sidebar-nav-link" href="<?= $CFG->wwwroot ?>/lessons/course.php?course_id=<?= $course->id ?>">
-                <svg class="c-sidebar-nav-icon">
-                    <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-bookmark"></use>
-                </svg>
-                <?= add_br($course->fullname); ?>
-            </a>
-        </li>
-        <li class="c-sidebar-nav-title">All Lessons</li>
-        <?php foreach ($all_lessons as  $all_lesson) {
-            $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$all_lesson->id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);
-            ?>
-            <li class="c-sidebar-nav-item c-sidebar-nav-dropdown <?= ($all_lesson->id == $lesson_data->id)? 'c-show' : '' ?> ">
-                <a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle" href="#">
-                    <svg class="c-sidebar-nav-icon">
-                        <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-notes"></use>
-                    </svg>
-                    <?= add_br($all_lesson->lesson) ?>
-                </a>
-                <ul class="c-sidebar-nav-dropdown-items">
-                    <?php $topic_count_l=1; if($topics != null){
-                        foreach ($topics as $topic) { ?>
-                            <li class="c-sidebar-nav-item">
-                                <a class="c-sidebar-nav-link <?= ($topic_data->id == $topic->id)? 'c-active' : ''; ?>" href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>">
-                            <span class="c-sidebar-nav-icon">
-                                <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-notes"></use>
-                            </span>
-                                    <?= add_br($topic->topic) ?>
-                                </a>
-                            </li>
-                        <?php  } } ?>
-                </ul>
-            </li>
-        <?php  }  ?>
-
-    </ul>
-    <button class="c-sidebar-minimizer c-class-toggler" type="button" data-target="_parent"
-            data-class="c-sidebar-minimized"></button>
-</div>
+    <?php include 'sidebar.php';?>
 <div class="c-wrapper c-fixed-components">
     <header class="c-header c-header-light c-header-fixed c-header-with-subheader">
         <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar"
@@ -190,13 +146,21 @@ $course = get_course($lesson_data->course_id);
 
                                         <div class="card-header-actions">
                                             <small style="font-size: 11px">Minimum reading time : <?= $topic_data->reading_time ?> mins</small>
+                                            <?php if(!empty($reading_data)) { ?>
+                                            <svg class="c-icon small text-success" id="reading_icon" style="margin-top: 0.35rem !important;">
+                                                <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-flag-alt"></use>
+                                            </svg>
+                                            <?php }else{ ?>
                                             <svg class="c-icon small text-warning" id="reading_icon" style="margin-top: 0.35rem !important;">
                                                 <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-av-timer"></use>
                                             </svg>
+                                            <?php } ?>
                                         </div>
                                     </h2>
                                     <?php if(!empty($reading_data)) { ?>
                                         <small class="mt-2">You have completed this lesson on <?= date('Y-m-d',strtotime($reading_data->created_at))?>. <?php if(!empty($pending_lesson_data)){ ?> <a href="<?=  $CFG->wwwroot.'/lessons/page.php?topic_id='.$pending_lesson_data->topic_id;?>">Go to the pending lesson?</a> <?php }?></small>
+                                    <?php }else{ ?>
+                                        <small class="mt-2 countdown">Complete in - <?= $topic_data->reading_time ?>:00</small>
                                     <?php } ?>
                                 </div>
                                 <div class="card-body">
@@ -240,7 +204,7 @@ $course = get_course($lesson_data->course_id);
                         <div class="col-sm-6 text-left">
                             <?php if(!empty($previous_link)){ ?>
                             <a class="btn btn-md btn-info pull-right" href="<?=$previous_link?>">
-                                <svg class="c-icon small text-primary" id="reading_icon">
+                                <svg class="c-icon small text-primary" id="">
                                     <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-left"></use>
                                 </svg>
                                 <?= $previous_text ?>
@@ -250,7 +214,7 @@ $course = get_course($lesson_data->course_id);
                         <div class="col-sm-6 text-right">
                             <?php if(!empty($next_link)){ ?>
                             <a class="btn btn-md btn-info <?php if(empty($reading_data)) { ?> disabled <?php } ?>"  href="<?=$next_link?>" id="next_btn">
-                                <svg class="c-icon small text-primary" id="reading_icon">
+                                <svg class="c-icon small text-primary" id="">
                                     <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-right"></use>
                                 </svg>
                                 <?= $next_text ?>
@@ -273,6 +237,22 @@ $course = get_course($lesson_data->course_id);
         var reading_time = parseInt('<?= $topic_data->reading_time ?>');
         reading_time = reading_time * 60 * 1000;
         setTimeout(studentView, reading_time);
+
+        var timer2 = "<?= $topic_data->reading_time ?>:00";
+        var interval = setInterval(function() {
+            var timer = timer2.split(':');
+            //by parsing integer, I avoid all extra string processing
+            var minutes = parseInt(timer[0], 10);
+            var seconds = parseInt(timer[1], 10);
+            --seconds;
+            minutes = (seconds < 0) ? --minutes : minutes;
+            if (minutes < 0) clearInterval(interval);
+            seconds = (seconds < 0) ? 59 : seconds;
+            seconds = (seconds < 10) ? '0' + seconds : seconds;
+            //minutes = (minutes < 10) ?  minutes : minutes;
+            $('.countdown').html(minutes + ':' + seconds);
+            timer2 = minutes + ':' + seconds;
+        }, 1000);
     });
 
     function studentView() {

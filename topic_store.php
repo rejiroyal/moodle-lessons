@@ -17,8 +17,7 @@ if(isset($_POST) && isset($_POST['topic_id'])){
 if(isset($_POST) && isset($_POST['topic_delete'])){
     if($_POST['topic_delete'] != '0'){
         $topic = $DB->get_record('eblix_topics', ['id'=>$_POST['topic_delete']]);
-        $DB->delete_records('eblix_topics', ['id'=>$_POST['topic_delete']]);
         $DB->delete_records('eblix_student_views', ['topic_id'=>$_POST['topic_delete']]);
-        redirect($CFG->wwwroot.'/lessons/topic_list.php?lesson_id='.$topic->lesson_id, 'Topic deleted successfully', null, \core\output\notification::NOTIFY_SUCCESS);
+        redirect($CFG->wwwroot.'/lessons/topic_list.php?lesson_id='.$topic->lesson_id, 'Sub topic deleted successfully', null, \core\output\notification::NOTIFY_SUCCESS);
     }
 }
