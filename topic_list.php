@@ -52,7 +52,7 @@ $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_id], $sort='sor
                             <td class="text-center"><?= $topic->sort_order ?></td>
                             <td class="text-center">
                                 <a class="btn btn-sm btn-success" title="Edit" href="<?= $CFG->wwwroot ?>/lessons/topic_create.php?lesson_id=<?= $lesson->id?>&topic_id=<?=$topic->id?>"><i class="far fa-edit"></i></a>
-                                <a class="btn btn-sm btn-danger delete-lesson" onclick="$('#topic_delete').val('<?= $topic->id?>');$('#topic_name').html('<?= $topic->topic ?>')" title="Delete" data-id="<?= $lesson->id?>" data-toggle="modal" data-target="#deleted_model"><i class="far fa-trash-alt"></i></a>
+                                <a class="btn btn-sm btn-danger delete-topic" onclick="$('#topic_delete').val('<?= $topic->id?>');$('#topic_name').html('<?= $topic->topic ?>')" title="Delete" data-id="<?= $topic->id?>" data-toggle="modal" data-target="#deleted_model"><i class="far fa-trash-alt"></i></a>
                             </td>
                         </tr>
                     <?php } } ?>
@@ -66,7 +66,7 @@ $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_id], $sort='sor
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleted_model_title">Delete Lesson</h5>
+                    <h5 class="modal-title" id="deleted_model_title">Delete Topic</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
