@@ -44,19 +44,12 @@ if(!empty($reading_data)){
         $read_complete = 1;
     }else{
         $remaining_reading_time = $remaining_reading_time - $remaining_mins;
-        $remaining_reading_time_m = floor($remaining_reading_time);      // 1
-        $remaining_reading_time_s = $remaining_reading_time - $remaining_reading_time_m;
+        /*$remaining_reading_time_m = floor($remaining_reading_time);      // 1
+        $remaining_reading_time_s = $remaining_reading_time - $remaining_reading_time_m;*/
 
-        //list($remaining_reading_time_m, $remaining_reading_time_s) = explode('.', $remaining_reading_time);
-        $remaining_reading_time_s_set = (string) ($remaining_reading_time_s/10 * 60);
-
-
-        $remaining_reading_time_s = (isset($remaining_reading_time_s_set[0]))? $remaining_reading_time_s_set[0] : '0';
-        $remaining_reading_time_s .= (isset($remaining_reading_time_s_set[1]))? $remaining_reading_time_s_set[1] : '0';
+        list($remaining_reading_time_m, $remaining_reading_time_s) = explode('.', $remaining_reading_time);
+        $remaining_reading_time_s = $remaining_reading_time_s/10 * 60;
     }
-}else{
-    $remaining_reading_time_m = $lesson_data->reading_time;      // 1
-    $remaining_reading_time_s = '00';
 }
 
 /*$viewed_topics = $DB->get_records('eblix_student_views', ['lesson_id'=>$lesson_data->id, 'user_id'=>$USER->id]);
@@ -169,7 +162,7 @@ $course = get_course($lesson_data->course_id);
                                         <?= $topic_data->topic ?>
 
                                         <div class="card-header-actions">
-                                            <small style="font-size: 11px">Minimum reading time for lesson : <?= $lesson_data->reading_time ?> mins</small>
+                                            <small style="font-size: 15px">Minimum reading time for lesson : <?= $lesson_data->reading_time ?> mins</small>
                                             <?php if($read_complete === 1) { ?>
                                             <svg class="c-icon small text-success" id="reading_icon" style="margin-top: 0.35rem !important;">
                                                 <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-flag-alt"></use>
@@ -184,7 +177,7 @@ $course = get_course($lesson_data->course_id);
                                     <?php if($read_complete === 1) { ?>
                                         <small class="mt-2">You have completed this lesson.</small>
                                     <?php }else{ ?>
-                                        <small class="mt-2 countdown"></small>
+                                        <small class="mt-2 countdown" style="font-size:18px;font-weight:bold;color:red;"></small>
                                     <?php } ?>
                                 </div>
                                 <div class="card-body">

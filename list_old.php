@@ -29,14 +29,9 @@ $lessons = $DB->get_records('eblix_lessons', ['course_id'=>$course_id], $sort='c
 
 
 ?>
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <style>
-        .select2-container .select2-selection--single {height: 35px !important;}
-    </style>
-
     <div class="row">
         <div class="col-md-6 text-left">
-            <select class="form-control select-2" id="course_select" autocomplete="off">
+            <select class="form-control" id="course_select" autocomplete="off">
                 <option value="">Select A Course</option>
                 <?php if(count($courses) > 0) { foreach ($courses as $course) { if($course->format != 'site') { ?>
                     <option value="<?= $course->id ?>" <?= ( $course_id == $course->id )? 'selected="selected"' : ''; ?> ><?= $course->fullname ?></option>
@@ -149,13 +144,7 @@ $lessons = $DB->get_records('eblix_lessons', ['course_id'=>$course_id], $sort='c
 
     <script src="assets/js/jquery-3.5.1.min.js"></script>
     <script src="https://kit.fontawesome.com/9e05556956.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-
-    $(document).ready(function() {
-        $('.select-2').select2();
-    });
-
     function copyToClipboard(element,copy) {
 
         var link = copy.html();

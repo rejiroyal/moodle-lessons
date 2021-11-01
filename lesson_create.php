@@ -39,6 +39,22 @@ echo $OUTPUT->header();
                 <label for="lesson_name">Lesson Name</label>
                 <input type="text" maxlength="225" class="form-control" id="lesson_name" name="lesson_name" placeholder="Lesson Name" value="<?= ($lesson_data != null)? $lesson_data->lesson : ''; ?>" required>
             </div>
+
+            <div class="form-group">
+                <label for="reading_time">Minimum reading time</label>
+                <div class="input-group">
+                    <input type="number" min="0" step="1" class="form-control col-2" id="reading_time" name="reading_time" placeholder="Reading Time" aria-label="Reading Time" aria-describedby="reading_time-addon" value="<?= ($lesson_data != null)? $lesson_data->reading_time : '5'; ?>" >
+                    <div class="input-group-append">
+                        <span class="input-group-text" id="reading_time-addon">minutes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="reading_time">Quiz ID</label>
+                <input type="number" min="1" step="1" class="form-control col-2" id="quiz_id" name="quiz_id" placeholder="Quiz ID" aria-label="Quiz ID"  value="<?= ($lesson_data != null)? $lesson_data->quiz_id : ''; ?>" >
+            </div>
+
             <div class="form-group">
                 <label for="sort_order">Sort order</label>
                 <input type="number" min="0" class="form-control col-4" id="sort_order" name="sort_order" placeholder="Sort Order" value="<?= ($lesson_data != null)? $lesson_data->sort_order : ''; ?>" >

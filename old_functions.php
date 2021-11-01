@@ -13,7 +13,7 @@ function add_br($sting){
 function updateTimeData($lesson_id,$USER,$DB){
     $pre_reading_data = $DB->get_record('eblix_student_reading_times', ['user_id' => $USER->id, 'lesson_id' => $lesson_id]);
     if ($pre_reading_data == null) {
-        $data_arr = (object)['user_id' => $USER->id, 'lesson_id' => $lesson_id, 'reading_time' => 20, 'viewed_times' => 1, 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')];
+        $data_arr = (object)['user_id' => $USER->id, 'lesson_id' => $lesson_id, 'reading_time' => 30, 'viewed_times' => 1, 'created_at' => date('Y-m-d H:i:s'), 'updated_at' => date('Y-m-d H:i:s')];
         $DB->insert_record('eblix_student_reading_times', $data_arr);
     }else{
         $updated_time = $pre_reading_data->reading_time + 20;
@@ -92,11 +92,7 @@ function checkQuizPass($lesson_id,$USER,$DB){
 
     $lesson_data = $DB->get_record('eblix_lessons', ['id'=>$lesson_id]);
 
-    if(!empty($lesson_data)){
-        return true;
-    }
-
-    if(empty($lesson_data->quiz_id)){
+    if(!empty($lesson_data) && empty($lesson_data->quiz_id)){
         return true;
     }
 
@@ -106,8 +102,6 @@ function checkQuizPass($lesson_id,$USER,$DB){
             if($quiz_data->grade >= 100){
                 return true;
             }
-        }else{
-            return true;
         }
     }
     return false;

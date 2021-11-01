@@ -133,7 +133,7 @@ $all_lessons = $DB->get_records('eblix_lessons', ['course_id'=>$course->id], $so
         </main>
         <footer class="c-footer">
             <div><a href="https://www.evolution.edu.au/">Evolution Hospitality Institute</a> © <?= date('Y')?>.</div>
-            <div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>
+            <!--<div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>-->
         </footer>
     </div>
 </div>

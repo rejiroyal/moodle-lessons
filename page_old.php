@@ -44,19 +44,12 @@ if(!empty($reading_data)){
         $read_complete = 1;
     }else{
         $remaining_reading_time = $remaining_reading_time - $remaining_mins;
-        $remaining_reading_time_m = floor($remaining_reading_time);      // 1
-        $remaining_reading_time_s = $remaining_reading_time - $remaining_reading_time_m;
+        /*$remaining_reading_time_m = floor($remaining_reading_time);      // 1
+        $remaining_reading_time_s = $remaining_reading_time - $remaining_reading_time_m;*/
 
-        //list($remaining_reading_time_m, $remaining_reading_time_s) = explode('.', $remaining_reading_time);
-        $remaining_reading_time_s_set = (string) ($remaining_reading_time_s/10 * 60);
-
-
-        $remaining_reading_time_s = (isset($remaining_reading_time_s_set[0]))? $remaining_reading_time_s_set[0] : '0';
-        $remaining_reading_time_s .= (isset($remaining_reading_time_s_set[1]))? $remaining_reading_time_s_set[1] : '0';
+        list($remaining_reading_time_m, $remaining_reading_time_s) = explode('.', $remaining_reading_time);
+        $remaining_reading_time_s = $remaining_reading_time_s/10 * 60;
     }
-}else{
-    $remaining_reading_time_m = $lesson_data->reading_time;      // 1
-    $remaining_reading_time_s = '00';
 }
 
 /*$viewed_topics = $DB->get_records('eblix_student_views', ['lesson_id'=>$lesson_data->id, 'user_id'=>$USER->id]);

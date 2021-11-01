@@ -28,8 +28,14 @@ if($lesson_data == null){
 }
 
 
-$viewed_topics = $DB->get_records('eblix_student_views', ['lesson_id'=>$lesson_data->id, 'user_id'=> $USER->id]);
-$topic_count = $DB->count_records('eblix_topics', ['lesson_id'=>$lesson_data->id]);
+//$viewed_topics = $DB->get_records('eblix_student_views', ['lesson_id'=>$lesson_data->id, 'user_id'=> $USER->id]);
+$reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id]);
+$reading_amount = '0';
+if(!empty($reading_data)){
+    $reading_amount = $reading_data->reading_time / 60;
+}
+
+//$topic_count = $DB->count_records('eblix_topics', ['lesson_id'=>$lesson_data->id]);
 
 $all_lessons = $DB->get_records('eblix_lessons', ['course_id'=>$lesson_data->course_id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);;
 
@@ -129,10 +135,10 @@ $course = get_course($lesson_data->course_id);
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-header">Progress <?= (!user_has_role_assignment($USER->id,5))? '<small class="text-warning">Only for students</small>' : (round((count($viewed_topics) / $topic_count ) * 100)).'%'; ?></div>
+                                <div class="card-header">Progress <?= (!user_has_role_assignment($USER->id,5))? '<small class="text-warning">Only for students</small>' : (round(($reading_amount/ $lesson_data->reading_time ) * 100)).'%'; ?></div>
                                 <div class="card-body">
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="<?= ( count($viewed_topics) / $topic_count ) * 100; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= ( count($viewed_topics) / $topic_count ) * 100; ?>%"></div>
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="<?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>%"></div>
                                     </div>
                                 </div>
                             </div>
@@ -150,11 +156,13 @@ $course = get_course($lesson_data->course_id);
                                         <?php $count = 1;
                                         $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);
                                         if($topics != null){
-                                        foreach ($topics as $topic) { ?>
+                                        foreach ($topics as $topic) {
+                                            //$topic_reading_data = $DB->get_record('eblix_student_views', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id, 'topic_id' => $topic->id])?>
                                             <a href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>">
                                                 <li class="list-group-item"><span class="badge badge-info ml-auto mr-auto"><?= sprintf("%02d", $count)?></span> <?= $topic->topic?></li>
                                             </a>
-                                        <?php $count++; } } ?>
+                                        <?php $count++; }
+                                        } ?>
                                     </ul>
                                 </div>
                             </div>
@@ -172,12 +180,28 @@ $course = get_course($lesson_data->course_id);
                         }
 
                         $next = $DB->get_record_sql('select * from '.$db_prefix.'eblix_lessons where sort_order = (select min(sort_order) from '.$db_prefix.'eblix_lessons where sort_order > '.$lesson_data->sort_order.' AND course_id = '.$lesson_data->course_id.' )  AND course_id = '.$lesson_data->course_id);
+
+                        $lesson_reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id]);
+
+                        $lesson_read_complete = false;
+                        if(!empty($lesson_reading_data)) {
+                            if (($lesson_reading_data->reading_time / 60) >= $lesson_data->reading_time) {
+                                $lesson_read_complete = true;
+                            }
+                        }
+
+                        $lesson_quiz_pass = checkQuizPass($lesson_data->id, $USER, $DB);
+
                         $next_link = '';
                         $next_text = '';
-                        if(!empty($next)){
-                            $next_link = $CFG->wwwroot.'/lessons/?lesson_id='.$next->id;
-                            $next_text = 'Next Lesson';
+
+                        if($lesson_read_complete == true && $lesson_quiz_pass == true){
+                            if(!empty($next)){
+                                $next_link = $CFG->wwwroot.'/lessons/?lesson_id='.$next->id;
+                                $next_text = 'Next Lesson';
+                            }
                         }
+
                         ?>
 
                         <div class="col-sm-6 text-left">
@@ -206,7 +230,7 @@ $course = get_course($lesson_data->course_id);
         </main>
         <footer class="c-footer">
             <div><a href="https://www.evolution.edu.au/">Evolution Hospitality Institute</a> © <?= date('Y')?>.</div>
-            <div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>
+            <!<div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>-->
         </footer>
     </div>
 </div>

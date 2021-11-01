@@ -42,7 +42,7 @@ echo $OUTPUT->header();
 
 ?>
 
-<script src="https://cdn.tiny.cloud/1/eao9fle14lrlquirwkrdzonsqhwx4p5036yybl48i9slb6m7/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+<script src="path/to/tinymce/tinymce.min.js"></script> <!-- newly added on 06-Sept-2021 -->
 
 <div class="row">
     <div class="col-12">
@@ -59,7 +59,7 @@ echo $OUTPUT->header();
                 <input type="number" min="0" class="form-control col-2" id="sort_order" name="sort_order" placeholder="Sort Order" value="<?= ($topic_data != null)? $topic_data->sort_order : $new_sort_order; ?>" >
             </div>
 
-            <div class="form-group">
+            <div class="form-group" style="display: none">
                 <label for="reading_time">Minimum reading time</label>
                 <div class="input-group">
                     <input type="number" min="0" step="0.1" class="form-control col-2" id="reading_time" name="reading_time" placeholder="Reading Time" aria-label="Reading Time" aria-describedby="reading_time-addon" value="<?= ($topic_data != null)? $topic_data->reading_time : '5'; ?>" >
@@ -103,8 +103,13 @@ echo $OUTPUT->header();
 
         external_filemanager_path:"<?= $CFG->wwwroot ?>/lessons/responsive_filemanager/filemanager/",
         filemanager_title:"Responsive Filemanager" ,
-        external_plugins: { "filemanager" : "<?= $CFG->wwwroot ?>/lessons/responsive_filemanager/filemanager/plugin.min.js"}
+        external_plugins: { "filemanager" : "<?= $CFG->wwwroot ?>/lessons/responsive_filemanager/filemanager/plugin.min.js"},
+        init_instance_callback : alertHide
     });
+
+    function alertHide(){
+        $('.tox-notification__dismiss').trigger('click');
+    }
 </script>
 
 <?php

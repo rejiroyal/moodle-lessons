@@ -59,7 +59,7 @@ $topic_count = $DB->count_records('eblix_topics', ['lesson_id'=>$lesson->id]);
                     foreach ($students as $student) {
                         $user = $DB->get_record('user', ['id'=>$student->user_id]);
 
-                        $reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $lesson->id]);
+                        $reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id]);
                         $reading_amount = '0';
                         if(!empty($reading_data)){
                             $reading_amount = $reading_data->reading_time / 60;
@@ -77,7 +77,7 @@ $topic_count = $DB->count_records('eblix_topics', ['lesson_id'=>$lesson->id]);
                         ?>
                         <tr>
                             <td><?= $user->firstname.' '.$user->lastname ?></td>
-                            <td class="text-center"><?= ( $reading_amount / $lesson->reading_time ) * 100; ?>%</td>
+                            <td class="text-center"><?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>%</td>
                             <!--<td>
                                 <small>
                                     <?php /*foreach ($viewed_topics_all as $item){
