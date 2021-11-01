@@ -213,8 +213,24 @@ $course = get_course($lesson_data->course_id);
                         $next_link = '';
                         $next_text = '';
                         $next_topic_id = '';
+                        $next_lesson_id = '';
                         $next = $DB->get_record_sql('select * from '.$db_prefix.'eblix_topics where sort_order = (select min(sort_order) from '.$db_prefix.'eblix_topics where sort_order > '.$topic_data->sort_order.' AND lesson_id = '.$topic_data->lesson_id.' ) AND lesson_id = '.$topic_data->lesson_id);
                         if(!empty($next)){
+
+                            $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
+                            if(!empty($quiz_topic)){
+                                foreach ($quiz_topic as $quiz_topic){}
+                            }
+
+                            $disable = false;
+                            if(!empty($quiz_topic) && $quiz_topic->id == $next->id){
+                                if($read_complete === 1){
+                                    $disable = false;
+                                }else{
+                                    $disable = true;
+                                }
+                            }
+
                             $next_link = $CFG->wwwroot.'/lessons/page.php?topic_id='.$next->id;
                             $next_text = 'Next Topic';
                             $next_topic_id = $next->id;
@@ -234,6 +250,7 @@ $course = get_course($lesson_data->course_id);
 
                             if($lesson_read_complete == true && $lesson_quiz_pass == true){
                                 if(!empty($next)){
+                                    $next_lesson_id = $next->id;
                                     $next_link = $CFG->wwwroot.'/lessons/?lesson_id='.$next->id;
                                     $next_text = 'Next Lesson';
                                 }
@@ -253,7 +270,7 @@ $course = get_course($lesson_data->course_id);
                         </div>
                         <div class="col-sm-6 text-right">
                             <?php if(!empty($next_link)){ ?>
-                            <a class="btn btn-md btn-info <?php if($read_complete !== 1 && !empty($next_topic_id) && !$quiz_pass) { ?> disabled <?php } ?>"  href="<?=$next_link?>" id="next_btn">
+                            <a class="btn btn-md btn-info <?php if((!empty($next_topic_id) && $read_complete === 0 && !$lesson_quiz_pass) || (!empty($next_topic_id) && $disable)) { ?> disabled <?php } ?>"  href="<?=$next_link?>" id="next_btn">
                                 <svg class="c-icon small text-primary" id="">
                                     <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-right"></use>
                                 </svg>
@@ -340,16 +357,21 @@ $course = get_course($lesson_data->course_id);
             url: 'functions.php',
             type: 'POST',
             data : { action : 'reading_time' , lesson_id : lesson_id },
+            cache : false,
         }).done(function (resp) {
             if(resp == '1'){
                 $('#read_complete').val('1');
                 $('#reading_icon').removeClass('text-warning').addClass('text-success').html('<use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-flag-alt"></use>');
                 $('#next_btn').removeClass('disabled');
 
-                $('.lesson_link_<?= $next_topic_id?>').each(function(){
-                    var href = $(this).data('href');
-                    $(this).attr('href',href);
+                <?php if(!empty($next_lesson_id)){ ?>
+                $('.lesson_link_<?= $next_lesson_id?>').each(function(){
+                    if (!$(this).hasClass('quiz_topic')) {
+                        var href = $(this).data('href');
+                        $(this).attr('href',href);
+                    }
                 });
+                <?php } ?>
             }
         });
     }

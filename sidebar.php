@@ -24,6 +24,18 @@
             $all_lesson_count++;
 
             $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$all_lesson->id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);
+
+            $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$all_lesson->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
+            $this_lesson_reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $all_lesson->id]);
+            if(!empty($quiz_topic)){
+                foreach ($quiz_topic as $quiz_topic){}
+            }
+            $read_complete = false;
+            $remaining_mins = $this_lesson_reading_data->reading_time / 60;
+            if($remaining_mins >= $all_lesson->reading_time){
+                $read_complete = true;
+            }
+
             ?>
             <li class="c-sidebar-nav-item c-sidebar-nav-dropdown <?= ($all_lesson->id == $lesson_data->id)? 'c-show' : '' ?> ">
                 <a class="c-sidebar-nav-link c-sidebar-nav-dropdown-toggle" href="#">
@@ -36,7 +48,7 @@
                     <?php $topic_count_l=1; if($topics != null){
                         foreach ($topics as $topic) {
                             //$topic_reading_data = $DB->get_record('eblix_student_views', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id, 'topic_id' => $topic->id])
-                            ?>
+                             ?>
                             <li class="c-sidebar-nav-item">
                                 <!--<a id="topic_link_<?/*= $topic->id*/?>" class="c-sidebar-nav-link <?/*= ($topic_data->id == $topic->id)? 'c-active' : ''; */?>" href="<?/*= $CFG->wwwroot */?>/lessons/page.php?topic_id=<?/*= $topic->id */?>"   data-href="<?/*= $CFG->wwwroot */?>/lessons/page.php?topic_id=<?/*= $topic->id */?>">-->
                                 <?php
@@ -48,9 +60,17 @@
                                             $disable = false;
                                         }
                                     }
+
+                                    if(!$disable && !empty($quiz_topic) && $quiz_topic->id == $topic->id){
+                                        if($read_complete){
+                                            $disable = false;
+                                        }else{
+                                            $disable = true;
+                                        }
+                                    }
                                 ?>
 
-                                <a id="topic_link_<?= $topic->id?>" class="c-sidebar-nav-link lesson_link_<?= $all_lesson->id?> <?= ($topic_data->id == $topic->id)? 'c-active' : ''; ?>" <?php if( $disable == false || !user_has_role_assignment($USER->id,5)) { ?> href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>"  <?php  } ?> data-href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>">
+                                <a id="topic_link_<?= $topic->id?>" class="c-sidebar-nav-link lesson_link_<?= $all_lesson->id?> <?= ($topic_data->id == $topic->id)? 'c-active' : ''; ?> <?php if(!empty($quiz_topic) && $quiz_topic->id == $topic->id){ ?> quiz_topic <?php } ?>" <?php if( $disable == false || !user_has_role_assignment($USER->id,5)) { ?> href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>"  <?php  } ?> data-href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>">
                                     <span class="c-sidebar-nav-icon">
                                         <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-notes"></use>
                                     </span>

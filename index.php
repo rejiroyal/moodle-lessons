@@ -155,10 +155,32 @@ $course = get_course($lesson_data->course_id);
                                     <ul class="list-group">
                                         <?php $count = 1;
                                         $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);
+
+                                        $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
+                                        $this_lesson_reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id]);
+                                        if(!empty($quiz_topic)){
+                                            foreach ($quiz_topic as $quiz_topic){}
+                                        }
+                                        $read_complete = false;
+                                        $remaining_mins = $this_lesson_reading_data->reading_time / 60;
+                                        if($remaining_mins >= $lesson_data->reading_time){
+                                            $read_complete = true;
+                                        }
+
                                         if($topics != null){
                                         foreach ($topics as $topic) {
+
+                                            $disable = false;
+                                            if(!empty($quiz_topic) && $quiz_topic->id == $topic->id){
+                                                if($read_complete){
+                                                    $disable = false;
+                                                }else{
+                                                    $disable = true;
+                                                }
+                                            }
+
                                             //$topic_reading_data = $DB->get_record('eblix_student_views', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id, 'topic_id' => $topic->id])?>
-                                            <a href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>">
+                                            <a <?php if(!$disable) { ?> href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>" <?php } ?>>
                                                 <li class="list-group-item"><span class="badge badge-info ml-auto mr-auto"><?= sprintf("%02d", $count)?></span> <?= $topic->topic?></li>
                                             </a>
                                         <?php $count++; }
@@ -230,7 +252,7 @@ $course = get_course($lesson_data->course_id);
         </main>
         <footer class="c-footer">
             <div><a href="https://www.evolution.edu.au/">Evolution Hospitality Institute</a> © <?= date('Y')?>.</div>
-            <!<div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>-->
+            <div class="ml-auto">Powered by&nbsp;<a href="https://www.eblix.com.au/">eBlix Technologies</a></div>
         </footer>
     </div>
 </div>
