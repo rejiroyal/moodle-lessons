@@ -69,12 +69,8 @@ $pending_lesson_data = $DB->get_record_sql('SELECT *,'.$db_prefix.'eblix_topics.
 
 $course = get_course($lesson_data->course_id);
 
-$quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
-if(!empty($quiz_topic)){
-    foreach ($quiz_topic as $quiz_topic){}
-}
-
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,7 +107,13 @@ if(!empty($quiz_topic)){
     <link href="assets/assets/vendors/@coreui/chartjs/css/coreui-chartjs.css" rel="stylesheet">
 </head>
 <body class="c-app">
-    <?php include 'sidebar.php';?>
+    <?php include 'sidebar.php';
+
+    $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
+    if(!empty($quiz_topic)){
+        foreach ($quiz_topic as $quiz_topic){}
+    }
+    ?>
 <div class="c-wrapper c-fixed-components">
     <header class="c-header c-header-light c-header-fixed c-header-with-subheader">
         <button class="c-header-toggler c-class-toggler d-lg-none mfe-auto" type="button" data-target="#sidebar"
@@ -179,7 +181,7 @@ if(!empty($quiz_topic)){
                                         </div>
                                     </h2>
 
-                                    <div class="row" <?php if(!empty($lesson_data->quiz_id) && !empty($quiz_topic) && $quiz_topic->id == $topic_data->id){ ?> style="display:none;" <?php } ?> >
+                                    <div class="row" <?php if(!empty($lesson_data->quiz_id) && !empty($quiz_topic) && $quiz_topic->id == $topic_data->id){ ?> style="display:none !important;" <?php } ?> >
                                         <div class="col-md-12">
                                             <div class="float-left float-sm-right">
                                                 <small style="font-size: 16px">Minimum reading time for lesson : <strong><?= $lesson_data->reading_time ?> mins</strong></small> <!-- font-size changed -->
