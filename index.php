@@ -118,7 +118,7 @@ $course = get_course($lesson_data->course_id);
                 </div>
             </li>
         </ul>
-        <div class="c-subheader px-3">
+        <div class="c-subheader px-3 d-none d-sm-block">
             <!-- Breadcrumb-->
             <ol class="breadcrumb border-0 m-0">
                 <li class="breadcrumb-item"><a href="<?= $CFG->wwwroot ?>">Evolution</a></li>
@@ -154,6 +154,30 @@ $course = get_course($lesson_data->course_id);
                                 <div class="card-body">
                                     <ul class="list-group">
                                         <?php $count = 1;
+
+                                        $lesson_key = '';
+                                        $lesson_count = 0;
+                                        $lessons_array = array();
+                                        $previous_read_complete = true;
+                                        foreach ($all_lessons as  $all_lesson) {
+                                            $lessons_array[] = $all_lesson->id;
+                                            if($all_lesson->id == $lesson_data->id){
+                                                $lesson_key = $lesson_count;
+                                            }
+                                            $lesson_count++;
+                                        }
+
+                                        $keys = array_keys($lessons_array);
+                                        $pre_lesson = $lessons_array[$keys[array_search($lesson_key, $keys)-1]];
+
+                                        if(!empty($pre_lesson)){
+                                            $pre_lesson_reading_data = $DB->get_record('eblix_student_reading_times', ['user_id'=>$USER->id,'lesson_id' => $pre_lesson]);
+                                            $remaining_mins = $pre_lesson_reading_data->reading_time / 60;
+                                            if($remaining_mins < $lesson_data->reading_time){
+                                                $previous_read_complete = false;
+                                            }
+                                        }
+
                                         $topics = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order', $fields='*', $limitfrom=0, $limitnum=0);
 
                                         $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
@@ -168,22 +192,22 @@ $course = get_course($lesson_data->course_id);
                                         }
 
                                         if($topics != null){
-                                        foreach ($topics as $topic) {
+                                            foreach ($topics as $topic) {
 
-                                            $disable = false;
-                                            if(!empty($quiz_topic) && $quiz_topic->id == $topic->id){
-                                                if($read_complete){
-                                                    $disable = false;
-                                                }else{
-                                                    $disable = true;
+                                                $disable = false;
+                                                if(!empty($lesson_data->quiz_id) && !empty($quiz_topic) && $quiz_topic->id == $topic->id){
+                                                    if($read_complete){
+                                                        $disable = false;
+                                                    }else{
+                                                        $disable = true;
+                                                    }
                                                 }
-                                            }
 
-                                            //$topic_reading_data = $DB->get_record('eblix_student_views', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id, 'topic_id' => $topic->id])?>
-                                            <a <?php if(!$disable) { ?> href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>" <?php } ?>>
-                                                <li class="list-group-item"><span class="badge badge-info ml-auto mr-auto"><?= sprintf("%02d", $count)?></span> <?= $topic->topic?></li>
-                                            </a>
-                                        <?php $count++; }
+                                                //$topic_reading_data = $DB->get_record('eblix_student_views', ['user_id'=>$USER->id,'lesson_id' => $lesson_data->id, 'topic_id' => $topic->id])?>
+                                                <a <?php if(!$disable && $previous_read_complete) { ?> href="<?= $CFG->wwwroot ?>/lessons/page.php?topic_id=<?= $topic->id ?>" <?php } ?>>
+                                                    <li class="list-group-item"><span class="badge badge-info ml-auto mr-auto"><?= sprintf("%02d", $count)?></span> <?= $topic->topic?></li>
+                                                </a>
+                                                <?php $count++; }
                                         } ?>
                                     </ul>
                                 </div>
