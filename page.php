@@ -69,6 +69,11 @@ $pending_lesson_data = $DB->get_record_sql('SELECT *,'.$db_prefix.'eblix_topics.
 
 $course = get_course($lesson_data->course_id);
 
+$quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
+if(!empty($quiz_topic)){
+    foreach ($quiz_topic as $quiz_topic){}
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -145,7 +150,7 @@ $course = get_course($lesson_data->course_id);
                 </div>
             </li>
         </ul>
-        <div class="c-subheader px-3">
+        <div class="c-subheader px-3 d-none d-sm-block">
             <!-- Breadcrumb-->
             <ol class="breadcrumb border-0 m-0">
                 <li class="breadcrumb-item"><a href="<?= $CFG->wwwroot ?>">Evolution</a></li>
@@ -169,23 +174,36 @@ $course = get_course($lesson_data->course_id);
                                         <?= $topic_data->topic ?>
 
                                         <div class="card-header-actions">
-                                            <small style="font-size: 11px">Minimum reading time for lesson : <?= $lesson_data->reading_time ?> mins</small>
-                                            <?php if($read_complete === 1) { ?>
-                                            <svg class="c-icon small text-success" id="reading_icon" style="margin-top: 0.35rem !important;">
-                                                <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-flag-alt"></use>
-                                            </svg>
-                                            <?php }else{ ?>
-                                            <svg class="c-icon small text-warning" id="reading_icon" style="margin-top: 0.35rem !important;">
-                                                <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-av-timer"></use>
-                                            </svg>
-                                            <?php } ?>
+
+
                                         </div>
                                     </h2>
-                                    <?php if($read_complete === 1) { ?>
-                                        <small class="mt-2">You have completed this lesson.</small>
-                                    <?php }else{ ?>
-                                        <small class="mt-2 countdown"></small>
-                                    <?php } ?>
+
+                                    <div class="row" <?php if(!empty($lesson_data->quiz_id) && !empty($quiz_topic) && $quiz_topic->id == $topic_data->id){ ?> style="display:none;" <?php } ?> >
+                                        <div class="col-md-12">
+                                            <div class="float-left float-sm-right">
+                                                <small style="font-size: 16px">Minimum reading time for lesson : <strong><?= $lesson_data->reading_time ?> mins</strong></small> <!-- font-size changed -->
+                                                <?php if($read_complete === 1) { ?>
+                                                    <svg class="c-icon small text-success" id="reading_icon" >
+                                                        <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-flag-alt"></use>
+                                                    </svg>
+                                                <?php }else{ ?>
+                                                    <svg class="c-icon small text-warning" id="reading_icon" >
+                                                        <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-av-timer"></use>
+                                                    </svg>
+                                                <?php } ?>
+                                            </div>
+
+                                            <div class="float-left">
+                                                <?php if($read_complete === 1) { ?>
+                                                    <small class="mt-2" style="font-size: 16px">You have completed this lesson.</small> <!-- font-size changed -->
+                                                <?php }else{ ?>
+                                                    <small class="mt-2 countdown" style="font-size: 16px;"></small> <!-- font-size changed -->
+                                                <?php } ?>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                 </div>
                                 <div class="card-body">
                                     <?= $topic_data->topic_content ?>
@@ -217,13 +235,8 @@ $course = get_course($lesson_data->course_id);
                         $next = $DB->get_record_sql('select * from '.$db_prefix.'eblix_topics where sort_order = (select min(sort_order) from '.$db_prefix.'eblix_topics where sort_order > '.$topic_data->sort_order.' AND lesson_id = '.$topic_data->lesson_id.' ) AND lesson_id = '.$topic_data->lesson_id);
                         if(!empty($next)){
 
-                            $quiz_topic = $DB->get_records('eblix_topics', ['lesson_id'=>$lesson_data->id], $sort='sort_order desc', $fields='*', $limitfrom=0, $limitnum=1);
-                            if(!empty($quiz_topic)){
-                                foreach ($quiz_topic as $quiz_topic){}
-                            }
-
                             $disable = false;
-                            if(!empty($quiz_topic) && $quiz_topic->id == $next->id){
+                            if(!empty($lesson_data->quiz_id) && !empty($quiz_topic) && $quiz_topic->id == $next->id){
                                 if($read_complete === 1){
                                     $disable = false;
                                 }else{
@@ -258,24 +271,29 @@ $course = get_course($lesson_data->course_id);
                         }
                         ?>
 
-                        <div class="col-sm-6 text-left">
+                        <div class="col-md-12">
                             <?php if(!empty($previous_link)){ ?>
-                            <a class="btn btn-md btn-info pull-right" href="<?=$previous_link?>">
-                                <svg class="c-icon small text-primary" id="">
-                                    <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-left"></use>
-                                </svg>
-                                <?= $previous_text ?>
-                            </a>
+                                <div class="float-left">
+                                    <a class="btn btn-md btn-info" href="<?=$previous_link?>">
+                                        <svg class="c-icon small text-primary" id="">
+                                            <use style="color:white;" xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-left"></use>
+                                        </svg>
+                                        <?= $previous_text ?>
+                                    </a>
+                                </div>
+
                             <?php } ?>
-                        </div>
-                        <div class="col-sm-6 text-right">
+
                             <?php if(!empty($next_link)){ ?>
-                            <a class="btn btn-md btn-info <?php if((!empty($next_topic_id) && $read_complete === 0 && !$lesson_quiz_pass) || (!empty($next_topic_id) && $disable)) { ?> disabled <?php } ?>"  href="<?=$next_link?>" id="next_btn">
-                                <svg class="c-icon small text-primary" id="">
-                                    <use xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-right"></use>
-                                </svg>
-                                <?= $next_text ?>
-                            </a>
+                                <div class="float-right">
+                                    <a class="btn btn-md btn-info <?php if((!empty($next_topic_id) && $read_complete === 0 && !$lesson_quiz_pass) || (!empty($next_topic_id) && $disable)) { ?> disabled <?php } ?>"  href="<?=$next_link?>" id="next_btn">
+                                        <?= $next_text ?>
+                                        <svg class="c-icon small text-primary" id="">
+                                            <use style="color:white;" xlink:href="assets/vendors/@coreui/icons/svg/free.svg#cil-arrow-thick-right"></use>
+                                        </svg>
+                                        
+                                    </a>
+                                </div>
                             <?php } ?>
                         </div>
                     </div>
@@ -324,12 +342,12 @@ $course = get_course($lesson_data->course_id);
                     $('.countdown').html('Lesson Completed');
                     clearInterval(interval)
                 }else{
-                    $('.countdown').html('Lesson complete in - ' + minutes + ':' + seconds);
+                    $('.countdown').html('<b>Lesson complete in ' + minutes + ':' + seconds); //font bold added
                 }
                 timer2 = minutes + ':' + seconds;
             }, 1000);
         }else{
-            $('.countdown').html('Lesson Completed');
+            $('.countdown').html('<span style="color:green;"><b>Lesson Completed</b></span>'); //font color added
         }
 
     });
