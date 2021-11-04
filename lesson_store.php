@@ -4,7 +4,7 @@ include_once 'admin_include.php';
 
 if(isset($_POST) && isset($_POST['lesson_id'])){
     if($_POST['lesson_id'] == '0'){
-        $data_arr = (object)['course_id'=>$_POST['course_id'], 'lesson'=>$_POST['lesson_name'], 'sort_order'=>$_POST['sort_order'],'created_by'=>$USER->id,'quiz_id'=>$_POST['quiz_id'],'reading_time'=>$_POST['reading_time'], 'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')];
+        $data_arr = (object)['course_id'=>$_POST['course_id'], 'lesson'=>$_POST['lesson_name'],'quiz_id'=>$_POST['quiz_id'],'reading_time'=>$_POST['reading_time'], 'sort_order'=>$_POST['sort_order'],'created_by'=>$USER->id,'quiz_id'=>$_POST['quiz_id'],'reading_time'=>$_POST['reading_time'], 'created_at'=>date('Y-m-d H:i:s'),'updated_at'=>date('Y-m-d H:i:s')];
         $DB->insert_record('eblix_lessons', $data_arr);
         redirect($CFG->wwwroot.'/lessons/list.php?course_id='.$_POST['course_id'], 'Lesson added successfully', null, \core\output\notification::NOTIFY_SUCCESS);
     }else{
