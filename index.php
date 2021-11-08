@@ -41,6 +41,11 @@ $all_lessons = $DB->get_records('eblix_lessons', ['course_id'=>$lesson_data->cou
 
 $course = get_course($lesson_data->course_id);
 
+
+$reading_percentage = round(( $reading_amount / $lesson_data->reading_time ) * 100);
+if($reading_percentage > 100){
+    $reading_percentage = 100;
+}
 ?>
 
 <!DOCTYPE html>
@@ -135,10 +140,10 @@ $course = get_course($lesson_data->course_id);
                     <div class="row">
                         <div class="col-12">
                             <div class="card">
-                                <div class="card-header">Progress <?= (!user_has_role_assignment($USER->id,5))? '<small class="text-warning">Only for students</small>' : (round(($reading_amount/ $lesson_data->reading_time ) * 100)).'%'; ?></div>
+                                <div class="card-header">Progress <?= (!user_has_role_assignment($USER->id,5))? '<small class="text-warning">Only for students</small>' : $reading_percentage.'%'; ?></div>
                                 <div class="card-body">
                                     <div class="progress">
-                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="<?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>%"></div>
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="<?= $reading_percentage; ?>" aria-valuemin="0" aria-valuemax="100" style="width: <?= ( $reading_amount / $lesson_data->reading_time ) * 100; ?>%"></div>
                                     </div>
                                 </div>
                             </div>

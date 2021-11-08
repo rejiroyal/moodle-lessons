@@ -92,7 +92,7 @@ function checkQuizPass($lesson_id,$USER,$DB){
 
     $lesson_data = $DB->get_record('eblix_lessons', ['id'=>$lesson_id]);
 
-    if(!empty($lesson_data)){
+    if(empty($lesson_data)){
         return true;
     }
 
@@ -107,7 +107,7 @@ function checkQuizPass($lesson_id,$USER,$DB){
                 return true;
             }
         }else{
-            return true;
+            return false;
         }
     }
     return false;
